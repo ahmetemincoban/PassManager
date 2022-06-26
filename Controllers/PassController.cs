@@ -19,35 +19,10 @@ namespace PassManager.Controllers
             _context = context;
         }
 
-        // GET: Pass
-        public async Task<IActionResult> Index()
-        {
-            var myContext = _context.Passwords.Include(p => p.Group);
-            return View(await myContext.ToListAsync());
-        }
-
-        // GET: Pass/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var passModel = await _context.Passwords
-                .Include(p => p.Group)
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (passModel == null)
-            {
-                return NotFound();
-            }
-
-            return View(passModel);
-        }
-
         // GET: Pass/Create
         public IActionResult Create(int? id)
         {
+            TempData["ID"]=id;
             return View();
         }
 

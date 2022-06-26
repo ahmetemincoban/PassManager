@@ -22,25 +22,7 @@ namespace PassManager.Controllers
         // GET: Group
         public async Task<IActionResult> Index(string aranan)
         {
-            return View(await _context.Groups.Include(x=>x.PassList).Where(x=>(x.groupName.Contains(aranan)) || aranan==null).ToListAsync());
-        }
-
-        // GET: Group/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var groupModel = await _context.Groups
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (groupModel == null)
-            {
-                return NotFound();
-            }
-
-            return View(groupModel);
+            return View(await _context.Groups.Include(x=>x.PassList).Where(x=>((x.groupName.Contains(aranan)) || aranan==null) && x.isPassive==false).ToListAsync());
         }
 
         // GET: Group/Create
@@ -140,7 +122,8 @@ namespace PassManager.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var groupModel = await _context.Groups.FindAsync(id);
-            _context.Groups.Remove(groupModel);
+            // _context.Groups.Remove(groupModel);
+            groupModel.isPassive=true;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

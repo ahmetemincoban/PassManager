@@ -1,15 +1,16 @@
 @model PassManager.Models.GroupModel
-
+@using PassManager.Data
+@inject MyContext myContext
 @{
     ViewData["Title"] = "Edit";
+    var grup = myContext.Groups.Find(Model.ID);
 }
 
-<h1>Edit</h1>
-
-<h4>GroupModel</h4>
+<h1 class="text-center">Edit @grup.groupName Group.</h1>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ID" />
@@ -18,21 +19,15 @@
                 <input asp-for="groupName" class="form-control" />
                 <span asp-validation-for="groupName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="UserID" class="control-label"></label>
-                <input asp-for="UserID" class="form-control" />
-                <span asp-validation-for="UserID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <div class="form-group postButtonDiv">
+                <input type="submit" value="Save" class="btn btn-primary postButtonHalf" />
+                <a asp-action="Index" asp-controller="Group" class="btn btn-dark postButtonHalf">Back to list</a>
             </div>
         </form>
     </div>
+    <div class="col-md-2"></div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

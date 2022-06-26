@@ -83,3 +83,17 @@ body {
 .list-group-item{
   border-radius: 12px;
 }
+
+.postButton{
+  width: calc(75%);
+}
+.postButtonHalf{
+  width: calc(35%);
+}
+.postButtonDiv{
+  text-align: center;
+}
+.list-group-control{
+  float: right;
+  margin-right: 0.2rem;
+}
