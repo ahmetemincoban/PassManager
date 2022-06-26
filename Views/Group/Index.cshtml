@@ -1,0 +1,55 @@
+@model IEnumerable<PassManager.Models.GroupModel>
+@using PassManager.Data
+@inject MyContext mycontext
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Welcome USER</h1>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Create New Group <i class="fa-solid fa-plus"></i></a>
+</p>
+<ol class="list-group list-group-numbered">
+    @foreach (var item in Model)
+    {
+        <li class="list-group-item d-flex justify-content-between align-items-start mb-1">
+            <div class="ms-2 me-auto w-100">
+                <div class="fw-bold"> <a class="btn btn-sm btn-primary" asp-action="Create"
+                    asp-controller="Pass" asp-route-id="@item.ID">Add Pass in @item.groupName Group <i class="fa-solid fa-plus"></i></a></div>
+                    <table class="w-100 ml-2">
+                        <thead class="w-100">
+                            <th class="w-25">Pass Name</th>
+                            <th class="w-25">Url</th>
+                            <th class="w-50">Pass</th>
+                        </thead>
+                @foreach (var pass in mycontext.Passwords.Where(x => (x.GroupID == item.ID) && (x.isPassive==false)))
+                {
+                        <tbody class="w-100">
+
+                            <tr class="w-100">
+                                <td class="w-25">@pass.passName</td>
+                                <td class="w-25"><a href="@pass.URL" target="_blank" class="yonlendirme">@pass.URL</a></td>
+                                <td class="w-50"><input disabled type="password" value="@pass.Pass" id="@pass.ID"> <input type="checkbox"
+                                onclick="myFunction(@pass.ID)">Show Password</td>
+                            </tr>
+                        </tbody>
+                }
+                </table>
+            </div>
+            <span class="badge bg-primary rounded-pill">@mycontext.Passwords.Where(x => (x.GroupID == item.ID) && (x.isPassive==false)).Count()</span>
+        </li>
+    }
+
+</ol>
+<script>
+    function myFunction(id) {
+        var x = document.getElementById(id);
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+</script>
