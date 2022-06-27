@@ -3,6 +3,11 @@
 @inject MyContext myContext
 @{
     ViewData["Title"] = "Edit";
+    var user=myContext.Users.Find(Model.UserID);
+    if (this.User.Identity.Name!=user.UserName)
+    {
+        Console.WriteLine("asdsa");
+    }
 }
 
 <h1 class="text-center">Edit @myContext.Passwords.Find(Model.ID).passName Password</h1>

@@ -1,0 +1,42 @@
+@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4 mt-5">
+        <div class="card text-white bg-dark mb-3" style="max-width: 28rem;">
+  <div style="text-align: center; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;" class="card-header"><h1>PassManager</h1></div>
+  <div class="card-body">
+    <h5 class="card-title text-center">Please Sign-In</h5>
+    <form id="account" method="post">
+        <p class="card-text">
+            <label asp-for="Input.Email">Email</label>
+                <input asp-for="Input.Email" class="form-control" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </p>
+        <p class="card-text">
+            <label asp-for="Input.Password">Password</label>
+                <input asp-for="Input.Password" class="form-control" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </p>
+        <p class="card-text">
+            <label asp-for="Input.RememberMe">
+                <input asp-for="Input.RememberMe" />
+                    Remember me?
+            </label>
+        </p>
+        <p class="card-text"><button style="width: -webkit-fill-available;" type="submit" class="btn btn-warning">Login</button></p>
+        <p class="card-text" style="text-align: center;"><a class="btn btn-outline-success" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register</a></p>
+    </form>
+  </div>
+</div>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -2,27 +2,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PassManager.Data;
 using PassManager.Models;
+using System.Security.Claims;
 
 namespace PassManager.Controllers
 {
+    [Authorize]
     public class GroupController : Controller
     {
         private readonly MyContext _context;
+        private readonly UserManager<AppUser> _userManager;
 
-        public GroupController(MyContext context)
+        public GroupController(MyContext context, UserManager<AppUser> userManager)
         {
+            _userManager = userManager;
             _context = context;
         }
 
         // GET: Group
         public async Task<IActionResult> Index(string aranan)
         {
-            return View(await _context.Groups.Include(x=>x.PassList).Where(x=>((x.groupName.Contains(aranan)) || aranan==null) && x.isPassive==false).ToListAsync());
+            return View(await _context.Groups.Include(x=>x.PassList).Where(x=>(((x.groupName.Contains(aranan)) || aranan==null) && x.isPassive==false) && x.UserID==this.User.FindFirstValue(ClaimTypes.NameIdentifier)).ToListAsync());
         }
 
         // GET: Group/Create
@@ -36,10 +42,11 @@ namespace PassManager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,groupName,UserID")] GroupModel groupModel)
+        public async Task<IActionResult> Create([Bind("groupName")] GroupModel groupModel)
         {
             if (ModelState.IsValid)
             {
+                groupModel.UserID=this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _context.Add(groupModel);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -56,6 +63,10 @@ namespace PassManager.Controllers
             }
 
             var groupModel = await _context.Groups.FindAsync(id);
+            if (groupModel.UserID!=this.User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                return RedirectToAction("Index", "Group");
+            }
             if (groupModel == null)
             {
                 return NotFound();
@@ -108,6 +119,10 @@ namespace PassManager.Controllers
 
             var groupModel = await _context.Groups
                 .FirstOrDefaultAsync(m => m.ID == id);
+            if (groupModel.UserID!=this.User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                return RedirectToAction("Index", "Group");
+            }
             if (groupModel == null)
             {
                 return NotFound();

@@ -20,8 +20,10 @@
             </div>
             <div class="form-group">
                 <label asp-for="Pass" class="control-label"></label>
-                <input asp-for="Pass" class="form-control" />
+                <input type="password" asp-for="Pass" id="1" class="form-control" />
                 <span asp-validation-for="Pass" class="text-danger"></span>
+                <input id="CbId" style="visibility: hidden;" type="checkbox"
+                                    onclick="myFunction(1)"><label for="CbId"><i class="fa-solid fa-eye"></i></label>
             </div>
             <div class="form-group">
                 <label asp-for="URL" class="control-label"></label>
@@ -40,4 +42,14 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+    function myFunction(id) {
+        var x = document.getElementById(id);
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+</script>
 }

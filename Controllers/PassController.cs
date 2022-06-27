@@ -2,27 +2,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PassManager.Data;
 using PassManager.Models;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace PassManager.Controllers
 {
+    [Authorize]
     public class PassController : Controller
     {
         private readonly MyContext _context;
+        private readonly UserManager<AppUser> _userManager;
 
-        public PassController(MyContext context)
+        public PassController(MyContext context, UserManager<AppUser> userManager)
         {
+            _userManager = userManager;
             _context = context;
         }
 
         // GET: Pass/Create
         public IActionResult Create(int? id)
         {
-            TempData["ID"]=id;
+            TempData["ID"] = id;
             return View();
         }
 
@@ -31,17 +37,18 @@ namespace PassManager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int? id,[Bind("passName,Pass,URL,UserID,GroupID")] PassModel passModel)
+        public async Task<IActionResult> Create(int? id, [Bind("passName,Pass,URL,UserID,GroupID")] PassModel passModel)
         {
             // var group = _context.Groups.Where(x=>x.ID==id);
             // passModel.Group=(GroupModel)group;
             if (ModelState.IsValid)
             {
-                passModel.GroupID=(int)id;
-                passModel.ModifiedDate=DateTime.Now;
+                passModel.GroupID = (int)id;
+                passModel.ModifiedDate = DateTime.Now;
+                passModel.UserID = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _context.Add(passModel);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index","Group");
+                return RedirectToAction("Index", "Group");
             }
             return View(passModel);
         }
@@ -55,6 +62,10 @@ namespace PassManager.Controllers
             }
 
             var passModel = await _context.Passwords.FindAsync(id);
+            if (passModel.UserID!=this.User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                return RedirectToAction("Index", "Group");
+            }
             if (passModel == null)
             {
                 return NotFound();
@@ -79,7 +90,7 @@ namespace PassManager.Controllers
             {
                 try
                 {
-                    passModel.ModifiedDate=DateTime.Now;
+                    passModel.ModifiedDate = DateTime.Now;
                     _context.Update(passModel);
                     await _context.SaveChangesAsync();
                 }
@@ -111,6 +122,10 @@ namespace PassManager.Controllers
             var passModel = await _context.Passwords
                 .Include(p => p.Group)
                 .FirstOrDefaultAsync(m => m.ID == id);
+            if (passModel.UserID!=this.User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                return RedirectToAction("Index", "Group");
+            }
             if (passModel == null)
             {
                 return NotFound();
@@ -126,7 +141,7 @@ namespace PassManager.Controllers
         {
             var passModel = await _context.Passwords.FindAsync(id);
             // _context.Passwords.Remove(passModel);
-            passModel.isPassive=true;
+            passModel.isPassive = true;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

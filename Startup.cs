@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using PassManager.Data;
+using PassManager.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace PassManager
 {
@@ -29,6 +31,10 @@ namespace PassManager
 
             services.AddDbContext<MyContext>(options =>
                     options.UseSqlite(Configuration.GetConnectionString("MyContext")));
+            
+            services.AddIdentity<AppUser,AppRole>(opt=>opt.SignIn.RequireConfirmedAccount=false)
+            .AddEntityFrameworkStores<MyContext>().AddDefaultTokenProviders().AddDefaultUI();
+            services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +55,7 @@ namespace PassManager
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -56,6 +63,7 @@ namespace PassManager
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Group}/{action=Index}/{id?}");
+                    endpoints.MapRazorPages();
             });
         }
     }

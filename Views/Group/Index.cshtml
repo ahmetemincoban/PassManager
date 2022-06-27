@@ -1,12 +1,23 @@
 @model IEnumerable<PassManager.Models.GroupModel>
 @using PassManager.Data
 @inject MyContext mycontext
+@using Microsoft.AspNetCore.Identity
+@using System.Globalization
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
 
 @{
     ViewData["Title"] = "Index";
+    string kadi="Dostum";
+    if(UserManager.GetUserName(User)!=null)
+    {
+        string eposta = UserManager.GetUserName(User);
+        string[] Split = eposta.Split('@');
+        kadi=CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Split[0]);
+    }
 }
 
-<h1>Welcome USER</h1>
+<h1>@kadi's Passwords</h1>
 
 <p>
     <a class="btn btn-primary" asp-action="Create">Create New Group <i class="fa-solid fa-plus"></i></a>
