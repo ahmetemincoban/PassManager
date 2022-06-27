@@ -62,6 +62,10 @@ namespace PassManager.Controllers
             }
 
             var passModel = await _context.Passwords.FindAsync(id);
+            if (passModel.isPassive==true)
+            {
+                return RedirectToAction("Index", "Group");
+            }
             if (passModel.UserID!=this.User.FindFirstValue(ClaimTypes.NameIdentifier))
             {
                 return RedirectToAction("Index", "Group");
@@ -79,7 +83,7 @@ namespace PassManager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,passName,Pass,UserID,GroupID")] PassModel passModel)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,passName,UserID,URL,Pass,GroupID")] PassModel passModel)
         {
             if (id != passModel.ID)
             {
@@ -91,6 +95,7 @@ namespace PassManager.Controllers
                 try
                 {
                     passModel.ModifiedDate = DateTime.Now;
+                    passModel.UserID=this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                     _context.Update(passModel);
                     await _context.SaveChangesAsync();
                 }
@@ -105,7 +110,7 @@ namespace PassManager.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index","Group");
             }
             ViewData["GroupID"] = new SelectList(_context.Groups, "ID", "ID", passModel.GroupID);
             return View(passModel);
@@ -143,7 +148,7 @@ namespace PassManager.Controllers
             // _context.Passwords.Remove(passModel);
             passModel.isPassive = true;
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Group");
         }
 
         private bool PassModelExists(int id)
