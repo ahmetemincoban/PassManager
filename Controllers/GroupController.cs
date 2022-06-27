@@ -79,7 +79,7 @@ namespace PassManager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,groupName,UserID")] GroupModel groupModel)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,groupName")] GroupModel groupModel)
         {
             if (id != groupModel.ID)
             {
@@ -90,6 +90,7 @@ namespace PassManager.Controllers
             {
                 try
                 {
+                    groupModel.UserID=this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                     _context.Update(groupModel);
                     await _context.SaveChangesAsync();
                 }
